@@ -1,0 +1,67 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>🏥 Totem — Emissão de Senha</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- Alerta de expediente fechado -->
+  <ion-card color="warning" *ngIf="!isOpen">
+    <ion-card-content>
+      <ion-icon name="time-outline"></ion-icon>
+      Expediente encerrado. Atendimento das <strong>07:00</strong> às <strong>17:00</strong>.
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Botões de emissão -->
+  <ion-card *ngIf="isOpen">
+    <ion-card-header>
+      <ion-card-title>Selecione o tipo de atendimento</ion-card-title>
+      <ion-card-subtitle>Toque no botão correspondente à sua necessidade</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+
+      <ion-button expand="block" color="danger" (click)="emit(TicketType.SP)" class="ion-margin-bottom">
+        <ion-icon name="star-outline" slot="start"></ion-icon>
+        ⭐ Senha Prioritária (SP)
+      </ion-button>
+      <p class="tipo-desc">Idosos, Gestantes, PCD — TM: 15 min</p>
+
+      <ion-button expand="block" color="primary" (click)="emit(TicketType.SG)" class="ion-margin-bottom">
+        <ion-icon name="document-text-outline" slot="start"></ion-icon>
+        📋 Senha Geral (SG)
+      </ion-button>
+      <p class="tipo-desc">Consultas, Coletas — TM: 5 min</p>
+
+      <ion-button expand="block" color="success" (click)="emit(TicketType.SE)" class="ion-margin-bottom">
+        <ion-icon name="flask-outline" slot="start"></ion-icon>
+        🧪 Retirada de Exames (SE)
+      </ion-button>
+      <p class="tipo-desc">TM: inferior a 1 min</p>
+
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Comprovante da senha emitida -->
+  <ion-card *ngIf="lastTicket" [color]="lastTicket.status === TicketStatus.DISCARDED ? 'medium' : 'light'">
+    <ion-card-header>
+      <ion-card-title>
+        {{ lastTicket.status === TicketStatus.DISCARDED ? '⚠️ Senha Descartada' : '✅ Sua Senha' }}
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content class="ion-text-center">
+      <h1 class="senha-numero">{{ lastTicket.id }}</h1>
+      <p><strong>Tipo:</strong> {{ ticketTypeLabel(lastTicket.type) }}</p>
+      <p><strong>Emitida em:</strong> {{ lastTicket.issuedAt | date:'HH:mm:ss' }}</p>
+      <p><strong>Status:</strong> {{ lastTicket.status }}</p>
+      <p *ngIf="lastTicket.status === TicketStatus.DISCARDED" class="ion-text-danger">
+        Sua senha foi descartada. Por favor, retire uma nova senha.
+      </p>
+      <p *ngIf="lastTicket.status !== TicketStatus.DISCARDED">
+        Acompanhe o painel de chamados e dirija-se ao guichê indicado quando chamado.
+      </p>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

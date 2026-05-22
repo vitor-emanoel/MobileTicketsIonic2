@@ -1,0 +1,38 @@
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--ion-color-medium);
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0;
+  color: var(--ion-color-dark);
+
+  &.success {
+    color: var(--ion-color-success);
+  }
+
+  &.medium {
+    color: var(--ion-color-medium);
+  }
+}
+
+.header-row {
+  background: var(--ion-color-light);
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.tipo-nome {
+  font-size: 0.85rem;
+  vertical-align: middle;
+}
+
+.nao-atendida {
+  color: var(--ion-color-medium);
+  font-style: italic;
+}

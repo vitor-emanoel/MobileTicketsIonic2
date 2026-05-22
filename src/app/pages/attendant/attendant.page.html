@@ -1,0 +1,121 @@
+<ion-header>
+  <ion-toolbar color="tertiary">
+    <ion-title>🖥️ Painel da Atendente</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- Controle de Expediente -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Controle de Expediente</ion-card-title>
+      <ion-card-subtitle>Horário: 07:00 às 17:00</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-button
+        expand="block"
+        color="success"
+        (click)="openDay()"
+        [disabled]="state.isOpen">
+        <ion-icon name="play-circle-outline" slot="start"></ion-icon>
+        Abrir Expediente
+      </ion-button>
+      <ion-button
+        expand="block"
+        color="danger"
+        (click)="closeDay()"
+        [disabled]="!state.isOpen"
+        class="ion-margin-top">
+        <ion-icon name="stop-circle-outline" slot="start"></ion-icon>
+        Encerrar Expediente
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Status da Fila -->
+  <ion-card *ngIf="state?.isOpen">
+    <ion-card-header>
+      <ion-card-title>Status da Fila</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col class="ion-text-center">
+            <ion-badge color="danger">SP</ion-badge>
+            <p class="fila-count">{{ state.spQueue.length }}</p>
+          </ion-col>
+          <ion-col class="ion-text-center">
+            <ion-badge color="success">SE</ion-badge>
+            <p class="fila-count">{{ state.seQueue.length }}</p>
+          </ion-col>
+          <ion-col class="ion-text-center">
+            <ion-badge color="primary">SG</ion-badge>
+            <p class="fila-count">{{ state.sgQueue.length }}</p>
+          </ion-col>
+          <ion-col class="ion-text-center">
+            <ion-badge color="dark">Total</ion-badge>
+            <p class="fila-count">{{ totalInQueue }}</p>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <ion-item>
+        <ion-label>Guichê</ion-label>
+        <ion-select [(ngModel)]="currentDesk" interface="popover">
+          <ion-select-option [value]="1">Guichê 1</ion-select-option>
+          <ion-select-option [value]="2">Guichê 2</ion-select-option>
+          <ion-select-option [value]="3">Guichê 3</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-button
+        expand="block"
+        color="primary"
+        (click)="callNext()"
+        [disabled]="totalInQueue === 0 || !!state.currentTicket"
+        class="ion-margin-top">
+        <ion-icon name="arrow-forward-circle-outline" slot="start"></ion-icon>
+        Chamar Próxima Senha
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Atendimento em Curso -->
+  <ion-card *ngIf="state?.currentTicket" color="warning">
+    <ion-card-header>
+      <ion-card-title>⚡ Em Atendimento</ion-card-title>
+    </ion-card-header>
+    <ion-card-content class="ion-text-center">
+      <h1 class="senha-atual">{{ state.currentTicket!.id }}</h1>
+      <p>Guichê {{ state.currentTicket!.desk }} | Tipo: {{ state.currentTicket!.type }}</p>
+      <p>Chamada às: {{ state.currentTicket!.calledAt | date:'HH:mm:ss' }}</p>
+      <ion-button
+        expand="block"
+        color="success"
+        (click)="finish(state.currentTicket!)">
+        <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+        ✅ Finalizar Atendimento
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Últimas Chamadas -->
+  <ion-card *ngIf="state?.lastCalledTickets?.length">
+    <ion-card-header>
+      <ion-card-title>Últimas Chamadas</ion-card-title>
+    </ion-card-header>
+    <ion-list>
+      <ion-item *ngFor="let t of state.lastCalledTickets; let i = index">
+        <ion-label>
+          <h2>{{ t.id }}</h2>
+          <p>Guichê {{ t.desk }} | {{ t.type }} | {{ t.calledAt | date:'HH:mm:ss' }}</p>
+        </ion-label>
+        <ion-badge slot="end" [color]="t.status === TicketStatus.COMPLETED ? 'success' : 'warning'">
+          {{ t.status }}
+        </ion-badge>
+      </ion-item>
+    </ion-list>
+  </ion-card>
+
+</ion-content>

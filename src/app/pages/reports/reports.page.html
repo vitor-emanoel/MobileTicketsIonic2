@@ -1,0 +1,144 @@
+<ion-header>
+  <ion-toolbar color="medium">
+    <ion-title>📊 Relatórios</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="loadReport()">
+        <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- Data do relatório -->
+  <ion-item lines="none">
+    <ion-icon name="calendar-outline" slot="start" color="medium"></ion-icon>
+    <ion-label color="medium">
+      Relatório do dia: <strong>{{ today | date:'dd/MM/yyyy' }}</strong>
+    </ion-label>
+  </ion-item>
+
+  <!-- ── Quantitativo Geral ──────────────────────────────────────────── -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>📋 Quantitativo Geral</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col class="ion-text-center">
+            <p class="stat-label">Emitidas</p>
+            <p class="stat-value">{{ totalEmitidas }}</p>
+          </ion-col>
+          <ion-col class="ion-text-center">
+            <p class="stat-label">Atendidas</p>
+            <p class="stat-value success">{{ totalAtendidas }}</p>
+          </ion-col>
+          <ion-col class="ion-text-center">
+            <p class="stat-label">Descartadas</p>
+            <p class="stat-value medium">{{ totalDescartadas }}</p>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- ── Quantitativo por Prioridade ────────────────────────────────── -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>🎯 Por Prioridade</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row class="header-row">
+          <ion-col><strong>Tipo</strong></ion-col>
+          <ion-col class="ion-text-center"><strong>Emitidas</strong></ion-col>
+          <ion-col class="ion-text-center"><strong>Atendidas</strong></ion-col>
+          <ion-col class="ion-text-center"><strong>TM médio</strong></ion-col>
+        </ion-row>
+
+        <!-- SP -->
+        <ion-row>
+          <ion-col>
+            <ion-badge color="danger">SP</ion-badge>
+            <span class="tipo-nome"> Prioritária</span>
+          </ion-col>
+          <ion-col class="ion-text-center">{{ emitidas(TicketType.SP) }}</ion-col>
+          <ion-col class="ion-text-center">{{ atendidas(TicketType.SP) }}</ion-col>
+          <ion-col class="ion-text-center">{{ tmMedio(TicketType.SP) }} min</ion-col>
+        </ion-row>
+
+        <!-- SE -->
+        <ion-row>
+          <ion-col>
+            <ion-badge color="success">SE</ion-badge>
+            <span class="tipo-nome"> Exames</span>
+          </ion-col>
+          <ion-col class="ion-text-center">{{ emitidas(TicketType.SE) }}</ion-col>
+          <ion-col class="ion-text-center">{{ atendidas(TicketType.SE) }}</ion-col>
+          <ion-col class="ion-text-center">{{ tmMedio(TicketType.SE) }} min</ion-col>
+        </ion-row>
+
+        <!-- SG -->
+        <ion-row>
+          <ion-col>
+            <ion-badge color="primary">SG</ion-badge>
+            <span class="tipo-nome"> Geral</span>
+          </ion-col>
+          <ion-col class="ion-text-center">{{ emitidas(TicketType.SG) }}</ion-col>
+          <ion-col class="ion-text-center">{{ atendidas(TicketType.SG) }}</ion-col>
+          <ion-col class="ion-text-center">{{ tmMedio(TicketType.SG) }} min</ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- ── Relatório Detalhado de Senhas ──────────────────────────────── -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>🗂️ Detalhamento de Senhas</ion-card-title>
+      <ion-card-subtitle>
+        Numeração · Tipo · Emissão · Atendimento · Guichê · Status
+      </ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-list lines="inset" *ngIf="tickets.length > 0; else semDados">
+      <ion-item *ngFor="let t of tickets">
+        <ion-label>
+          <h2>
+            <strong>{{ t.id }}</strong>
+            <ion-badge [color]="typeColor(t.type)" style="margin-left: 8px">{{ t.type }}</ion-badge>
+          </h2>
+          <p>
+            <ion-icon name="time-outline"></ion-icon>
+            Emitida: {{ t.issuedAt | date:'dd/MM/yyyy HH:mm:ss' }}
+          </p>
+          <p *ngIf="t.calledAt">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            Atendida: {{ t.calledAt | date:'dd/MM/yyyy HH:mm:ss' }}
+            | Guichê: {{ t.desk }}
+          </p>
+          <p *ngIf="!t.calledAt" class="nao-atendida">
+            — Não atendida
+          </p>
+          <p *ngIf="t.serviceTime !== undefined">
+            <ion-icon name="stopwatch-outline"></ion-icon>
+            TM: {{ t.serviceTime }} min
+          </p>
+        </ion-label>
+        <ion-badge slot="end" [color]="badgeColor(t.status)">
+          {{ t.status }}
+        </ion-badge>
+      </ion-item>
+    </ion-list>
+
+    <ng-template #semDados>
+      <ion-card-content class="ion-text-center">
+        <ion-icon name="document-outline" size="large" color="medium"></ion-icon>
+        <p>Nenhuma senha emitida ainda. Abra o expediente e emita senhas pelo Totem.</p>
+      </ion-card-content>
+    </ng-template>
+  </ion-card>
+
+</ion-content>

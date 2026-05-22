@@ -1,0 +1,60 @@
+<ion-header>
+  <ion-toolbar color="dark">
+    <ion-title>📺 Painel de Chamados</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- Expediente fechado -->
+  <ion-card color="medium" *ngIf="!state?.isOpen">
+    <ion-card-content class="ion-text-center">
+      <ion-icon name="time-outline" size="large"></ion-icon>
+      <p>Expediente encerrado.</p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Senha em atendimento -->
+  <ion-card color="warning" *ngIf="state?.isOpen && state?.currentTicket">
+    <ion-card-header>
+      <ion-card-subtitle>Agora em atendimento</ion-card-subtitle>
+      <ion-card-title class="senha-destaque">
+        {{ state.currentTicket!.id }}
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content class="ion-text-center">
+      <p class="guiche-info">
+        <ion-icon name="business-outline"></ion-icon>
+        <strong> Guichê {{ state.currentTicket!.desk }}</strong>
+      </p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Nenhuma senha chamada ainda -->
+  <ion-card *ngIf="state?.isOpen && !state?.currentTicket">
+    <ion-card-content class="ion-text-center">
+      <ion-icon name="hourglass-outline" size="large"></ion-icon>
+      <p>Aguardando chamada…</p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Últimas 5 senhas chamadas (não exibe a próxima) -->
+  <ion-card *ngIf="state?.lastCalledTickets?.length">
+    <ion-card-header>
+      <ion-card-title>Últimas 5 senhas chamadas</ion-card-title>
+      <ion-card-subtitle>A próxima senha não é exibida antecipadamente</ion-card-subtitle>
+    </ion-card-header>
+    <ion-list lines="inset">
+      <ion-item *ngFor="let t of state.lastCalledTickets; let i = index">
+        <ion-avatar slot="start">
+          <ion-badge [color]="i === 0 ? 'warning' : 'medium'">{{ i + 1 }}º</ion-badge>
+        </ion-avatar>
+        <ion-label>
+          <h2><strong>{{ t.id }}</strong></h2>
+          <p>Guichê {{ t.desk }} | {{ t.type }} | {{ t.calledAt | date:'HH:mm:ss' }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ion-card>
+
+</ion-content>
