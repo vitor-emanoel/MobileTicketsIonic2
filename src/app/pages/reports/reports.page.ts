@@ -8,23 +8,41 @@ import { Ticket, TicketType, TicketStatus } from '../../models/ticket.model';
   styleUrls: ['./reports.page.scss']
 })
 export class ReportsPage implements OnInit {
+  ticketTypeEnum = TicketType;
+
   tickets: Ticket[] = [];
-  TicketType  = TicketType;
-  TicketStatus = TicketStatus;
-  today = new Date();
+  today: Date = new Date();
+  
+  detailedReport: any[] = [];
+  monthlyReport: any[] = [];
 
   constructor(private queueService: QueueService) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.loadReport();
   }
 
   loadReport(): void {
     this.tickets = this.queueService.getAllTickets();
-    this.today   = new Date();
-  }
+    this.today = new Date();
 
-  // ── Quantitativos gerais ─────────────────────────────────────────────────
+    const historicoSalvo = JSON.parse(localStorage.getItem('all_tickets_history') || '[]');
+    const todosOsTickets = [...historicoSalvo, ...this.tickets];
+
+    this.detailedReport = todosOsTickets.map(ticket => {
+      const isAttended = ticket.status === TicketStatus.COMPLETED || ticket.status === TicketStatus.IN_SERVICE;
+      return {
+        numeracao: ticket.id,
+        tipo: ticket.type,
+        dataHoraEmissao: ticket.issuedAt,
+        dataHoraAtendimento: isAttended ? ticket.calledAt : '',
+        guicheResponsavel: isAttended ? ticket.desk : ''
+      };
+    });
+
+    // Gera o relatório mensal usando a base histórica total de meses anteriores
+    this.monthlyReport = this.queueService.getMonthlyReport(); 
+  }
 
   get totalEmitidas(): number {
     return this.tickets.length;
@@ -38,25 +56,19 @@ export class ReportsPage implements OnInit {
     return this.tickets.filter(t => t.status === TicketStatus.DISCARDED).length;
   }
 
-  // ── Por prioridade ────────────────────────────────────────────────────────
-
-  emitidas(type: TicketType): number {
+  emitidas(type: string): number {
     return this.tickets.filter(t => t.type === type).length;
   }
 
-  atendidas(type: TicketType): number {
+  atendidas(type: string): number {
     return this.tickets.filter(
       t => t.type === type && t.status === TicketStatus.COMPLETED
     ).length;
   }
 
-  // ── TM médio por tipo ─────────────────────────────────────────────────────
-
-  tmMedio(type: TicketType): number {
+  tmMedio(type: any): number {
     return this.queueService.getAverageServiceTime(type);
   }
-
-  // ── Cor do badge por status ───────────────────────────────────────────────
 
   badgeColor(status: TicketStatus): string {
     const map: Record<TicketStatus, string> = {
@@ -67,8 +79,6 @@ export class ReportsPage implements OnInit {
     };
     return map[status] ?? 'medium';
   }
-
-  // ── Cor do badge por tipo ─────────────────────────────────────────────────
 
   typeColor(type: TicketType): string {
     const map: Record<TicketType, string> = {

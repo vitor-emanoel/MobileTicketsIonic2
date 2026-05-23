@@ -11,7 +11,6 @@
 
 <ion-content class="ion-padding">
 
-  <!-- Data do relatório -->
   <ion-item lines="none">
     <ion-icon name="calendar-outline" slot="start" color="medium"></ion-icon>
     <ion-label color="medium">
@@ -19,7 +18,6 @@
     </ion-label>
   </ion-item>
 
-  <!-- ── Quantitativo Geral ──────────────────────────────────────────── -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>📋 Quantitativo Geral</ion-card-title>
@@ -44,7 +42,6 @@
     </ion-card-content>
   </ion-card>
 
-  <!-- ── Quantitativo por Prioridade ────────────────────────────────── -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>🎯 Por Prioridade</ion-card-title>
@@ -58,43 +55,39 @@
           <ion-col class="ion-text-center"><strong>TM médio</strong></ion-col>
         </ion-row>
 
-        <!-- SP -->
         <ion-row>
           <ion-col>
             <ion-badge color="danger">SP</ion-badge>
             <span class="tipo-nome"> Prioritária</span>
           </ion-col>
-          <ion-col class="ion-text-center">{{ emitidas(TicketType.SP) }}</ion-col>
-          <ion-col class="ion-text-center">{{ atendidas(TicketType.SP) }}</ion-col>
-          <ion-col class="ion-text-center">{{ tmMedio(TicketType.SP) }} min</ion-col>
+          <ion-col class="ion-text-center">{{ emitidas(ticketTypeEnum.SP) }}</ion-col>
+          <ion-col class="ion-text-center">{{ atendidas(ticketTypeEnum.SP) }}</ion-col>
+          <ion-col class="ion-text-center">{{ tmMedio(ticketTypeEnum.SP) }} min</ion-col>
         </ion-row>
 
-        <!-- SE -->
         <ion-row>
           <ion-col>
             <ion-badge color="success">SE</ion-badge>
             <span class="tipo-nome"> Exames</span>
           </ion-col>
-          <ion-col class="ion-text-center">{{ emitidas(TicketType.SE) }}</ion-col>
-          <ion-col class="ion-text-center">{{ atendidas(TicketType.SE) }}</ion-col>
-          <ion-col class="ion-text-center">{{ tmMedio(TicketType.SE) }} min</ion-col>
+          <ion-col class="ion-text-center">{{ emitidas(ticketTypeEnum.SE) }}</ion-col>
+          <ion-col class="ion-text-center">{{ atendidas(ticketTypeEnum.SE) }}</ion-col>
+          <ion-col class="ion-text-center">{{ tmMedio(ticketTypeEnum.SE) }} min</ion-col>
         </ion-row>
 
-        <!-- SG -->
         <ion-row>
           <ion-col>
             <ion-badge color="primary">SG</ion-badge>
             <span class="tipo-nome"> Geral</span>
           </ion-col>
-          <ion-col class="ion-text-center">{{ emitidas(TicketType.SG) }}</ion-col>
-          <ion-col class="ion-text-center">{{ atendidas(TicketType.SG) }}</ion-col>
-          <ion-col class="ion-text-center">{{ tmMedio(TicketType.SG) }} min</ion-col>
+          <ion-col class="ion-text-center">{{ emitidas(ticketTypeEnum.SG) }}</ion-col>
+          <ion-col class="ion-text-center">{{ atendidas(ticketTypeEnum.SG) }}</ion-col>
+          <ion-col class="ion-text-center">{{ tmMedio(ticketTypeEnum.SG) }} min</ion-col>
         </ion-row>
       </ion-grid>
     </ion-card-content>
   </ion-card>
 
-  <!-- ── Relatório Detalhado de Senhas ──────────────────────────────── -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>🗂️ Detalhamento de Senhas</ion-card-title>
@@ -139,6 +132,47 @@
         <p>Nenhuma senha emitida ainda. Abra o expediente e emita senhas pelo Totem.</p>
       </ion-card-content>
     </ng-template>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>📅 Relatório Mensal Consolidade</ion-card-title>
+      <ion-card-subtitle>Resumo de emissões e atendimentos por mês</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-grid *ngIf="monthlyReport.length > 0; else semMensal">
+        <ion-row class="header-row" style="border-bottom: 2px solid var(--ion-color-light);">
+          <ion-col size="3"><strong>Mês</strong></ion-col>
+          <ion-col class="ion-text-center"><strong>Emitidas (SP/SE/SG)</strong></ion-col>
+          <ion-col class="ion-text-center"><strong>Atendidas (SP/SE/SG)</strong></ion-col>
+        </ion-row>
+
+        <ion-row *ngFor="let m of monthlyReport" style="align-items: center; border-bottom: 1px solid var(--ion-color-light);">
+          <ion-col size="3">
+            <strong>{{ m.mes }}</strong>
+          </ion-col>
+          <ion-col class="ion-text-center">
+            <ion-badge color="dark">{{ m.totalEmitidas }}</ion-badge>
+            <p style="margin: 4px 0 0 0; font-size: 0.75rem; color: var(--ion-color-medium);">
+              ({{ m.emitidasPorTipo.SP }} / {{ m.emitidasPorTipo.SE }} / {{ m.emitidasPorTipo.SG }})
+            </p>
+          </ion-col>
+          <ion-col class="ion-text-center">
+            <ion-badge color="success">{{ m.totalAtendidas }}</ion-badge>
+            <p style="margin: 4px 0 0 0; font-size: 0.75rem; color: var(--ion-color-medium);">
+              ({{ m.atendidasPorTipo.SP }} / {{ m.atendidasPorTipo.SE }} / {{ m.atendidasPorTipo.SG }})
+            </p>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <ng-template #semMensal>
+        <div class="ion-text-center ion-padding">
+          <p color="medium">Sem histórico acumulado de meses anteriores.</p>
+        </div>
+      </ng-template>
+    </ion-card-content>
   </ion-card>
 
 </ion-content>
